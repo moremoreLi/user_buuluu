@@ -39,6 +39,8 @@ public class Constant {
 	public static final String IOS_VERSION_NUM = "1.2.0";
 	
 	public static final String AOS_VERSION_NUM ="1.2.3";
+	
+	public static final String STRING_SPLIT ="_";
 
 	
 	

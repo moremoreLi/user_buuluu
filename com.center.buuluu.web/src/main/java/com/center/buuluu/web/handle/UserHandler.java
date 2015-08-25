@@ -302,95 +302,6 @@ public class UserHandler {
 			}
 		}
 		return false;
-	/*	
-		if (!countryCode.equals("66")) {//66表示的是亚洲国家，如果不是亚洲国家
-			autoCode = "1234";
-			if (user!=null) {
-				
-				 * 如果用户存在(以前是游客，不是正式用户的时候)，保存验证码到user表中
-				 
-				user.setTelApproveKey(autoCode);
-				user.setTelValueFlag(1);
-				user.setTel(tel);
-				user.setCountryCode(countryCode);
-				user.setUpdatedBy(Constant.UPDATE_BY_API);
-				user.setUpdatedTime(DateUtil.getCurrentDate());
-				return userService.update(user);
-			}else {
-				
-				 * 如果用户不存在(以前从来没有玩过这个游戏)，添加用户信息到user表中
-				 
-				user = new AppUser();
-				user.setTelApproveKey(autoCode);
-				user.setTelValueFlag(1);
-				user.setTel(tel);
-				user.setCountryCode(countryCode);
-				user.setCreatedBy(Constant.CREATE_BY_API);
-				user.setCreatedTime(DateUtil.getCurrentDate());
-				user.setId(Constant.getUUID());
-				user.setFlowCoins(0F);
-				user.setMakeFlow(0F);
-				user.setUserFlow(0F);
-				user.setSex(1);
-				user.setCredit(0);
-				user.setPoint(0);
-				user.setBirthday(-28800000L+"");//默认原始时间 1970-01-01
-				user.setIcon("");
-				user.setCountry("");
-				user.setNickName("");
-				user.setLog(0D);
-				user.setLat(0D);
-				flag = userService.addUser(user);
-				if (flag) {
-					return true;
-				}else{
-					return false;
-				}
-			}
-		}else if (resultMap.get("status").toString().equals("200")) {
-			
-			 * 表示发送验证码成功
-			 
-			if (user!=null) {
-				user.setTelApproveKey(autoCode);
-				user.setTelValueFlag(1);
-				user.setTel(tel);
-				user.setCountryCode(countryCode);
-				user.setUpdatedBy(Constant.UPDATE_BY_API);
-				user.setUpdatedTime(DateUtil.getCurrentDate());
-				return userService.update(user);
-			}else {
-				user = new AppUser();
-				user.setTelApproveKey(autoCode);
-				user.setTelValueFlag(1);
-				user.setTel(tel);
-				user.setCountryCode(countryCode);
-				user.setCreatedBy(Constant.CREATE_BY_API);
-				user.setCreatedTime(DateUtil.getCurrentDate());
-				user.setId(Constant.getUUID());
-				user.setFlowCoins(0F);
-				user.setMakeFlow(0F);
-				user.setUserFlow(0F);
-				user.setSex(1);
-				user.setCredit(0);
-				user.setPoint(0);
-				user.setBirthday(-28800000L+"");//默认原始时间 1970-01-01
-				user.setIcon("");
-				user.setCountry("");
-				user.setNickName("");
-				user.setLog(0D);
-				user.setLat(0D);
-				flag = userService.addUser(user);
-				if (flag) {
-					return true;
-				}else{
-					return false;
-				}
-			}
-		}else {
-			
-			throw new BaseAPIException();
-		}*/
 	}
 	
 	private  String getAutCode(int size){
@@ -400,15 +311,6 @@ public class UserHandler {
 	        Integer temp = 0;
 	       out:for (int i = 0; i < size; i++) {
 	        	temp=random.nextInt(10);
-//	        	if (list.contains(temp)) {
-//					while(true){
-//						temp =random.nextInt(10);
-//						if (!list.contains(temp)) {
-//							list.add(temp);
-//							continue out;
-//						}
-//					}
-//				}
 	        	list.add(temp);
 		   }
 

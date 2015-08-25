@@ -15,6 +15,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -83,13 +84,22 @@ public class UserSeviceController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/sendActivation.do")
+	@RequestMapping(value = "/sendActivation.do",method=RequestMethod.POST)
 	@Transactional
 	public String sendActivation(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi , String countryCode, String tel, Integer type) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(countryCode,null);
+		Assert.hasText(tel,null);
+		Assert.notNull(type);
 		String jsonStr = null;
 		AppUser user = null;
-		user = userService.getByTel(countryCode,tel);
+		user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 		/*
 		 * 用户存在，则提示用户已经存在，验证码已经发送过了，等待验证中的状态
 		 */
@@ -107,7 +117,6 @@ public class UserSeviceController {
 			throw new BaseAPIException();
 		}
 		
-		jsonStr = ResultUtil.getResultJson(user);
 		model.put("message", jsonStr);
 		return "message.json";
 	}
@@ -138,7 +147,7 @@ public class UserSeviceController {
 		String jsonStr = null;
 		AppUser user = null;
 		UserVO userVO = null;
-		user = userService.getByTel(countryCode,tel);
+		user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 		if (user == null) {
 			throw new NotVerifyActivationException(lang);
 		}
@@ -196,7 +205,7 @@ public class UserSeviceController {
 		String jsonStr = null;
 		AppUser user = null;
 		UserVO userVO = null;
-		user = userService.getByTel(countryCode,tel);
+		user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 		/*
 		 * 快速注册的时候，如果查询到该用户，表示该用户存在，如果没有查到该用户，则生成一个用户对象，保存到数据库中
 		 */
@@ -239,7 +248,7 @@ public class UserSeviceController {
 			String imei,String mac,String imsi , String countryCode, String tel, String activation) throws Exception {
 		String jsonStr = null;
 		AppUser user = null;
-		user = userService.getByTel(countryCode,tel);
+		user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 		if (user == null) {
 			throw new UserNotExistException(lang);
 		}
@@ -297,7 +306,7 @@ public class UserSeviceController {
 			jsonStr = returnJsonStr2(user.getId().toString(), Constant.getSessionId(), user);
 		}else {
 			AppUser user = null;
-			user = userService.getByTel(countryCode,tel);
+			user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 			if (user == null) {
 				throw new UserNotExistException(lang);
 			}
@@ -468,7 +477,7 @@ public class UserSeviceController {
 			if (resultMap.get("status").toString().equals("p")) {
 				//将数据库中的密码清除
 				AppUser user = null;
-				user = userService.getByTel(countryCode,tel);
+				user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 				user.setPwd("");
 				boolean flag =userService.update(user,user.getId());
 				jsonStr = ResultUtil.getResultJson("");

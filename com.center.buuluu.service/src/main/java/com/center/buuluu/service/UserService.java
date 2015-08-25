@@ -24,7 +24,7 @@ public interface UserService {
 	     * @param tel
 	     * @return
 	     */
-		AppUser getByTel(String countryCode, String tel);
+		AppUser getByTel(String countryCode, String tel,String countryCodeTel);
 		/**
 		 * 更新用户信息
 		 * @param user
