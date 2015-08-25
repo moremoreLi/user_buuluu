@@ -25,6 +25,7 @@ import com.center.buuluu.service.UserService;
 import com.center.buuluu.service.UserSessionService;
 import com.center.buuluu.service.VistorUserService;
 
+
 @Service("userService")
 @Transactional
 public class UserServiceImpl extends Context implements UserService{
