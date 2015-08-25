@@ -1,0 +1,19 @@
+#Created by JInto - www.guh-software.de
+#Wed Dec 10 15:28:35 CST 2014
+subject=autoCode is your verification code, please enter in 30 minutes in Buuluu mobile programs.
+-101=user not find
+-140=upload file fail
+-141=You have not uploaded files
+-142=input is not number
+-143=device is not number
+-144=update failed
+-145=No this route in the record of the user
+-146=No this point in the record of the route
+-147=
+-148=Wrong token
+-149=Save or update failure!
+-150=Edit orderStatus failure!
+-151=Send customer detail failure!
+-152=Send invoice detail failure!
+-2=Input parameter error
+-7=Your mobile number is being logged in on another device

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+
+	<!-- 数据库驱动包位置:注意是要配置自己本地的地址 -->
+     <classPathEntry location="G:\eclipse\mysql-connector-java-5.1.22\mysql-connector-java-5.1.22-bin.jar" /> 
+  <context id="AppVideo" >
+   <!-- 数据库链接URL、用户名、密码 -->
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/workone?useUnicode=true&amp;characterEncoding=utf-8" 
+    userId="root" password="root" />
+    
+     <!-- 生成实体类的包名和位置，这里配置将生成的实体类放在com.center.buuluu.model这个包下 -->
+    <javaModelGenerator targetPackage="com.center.buuluu.model" targetProject="com.center.buuluu.model">
+    
+        <property name="enableSubPackages" value="true" />
+        <!-- 如果字段为string且为null转换为空字符串 -->
+        <property name="trimStrings" value="true" />
+     </javaModelGenerator>
+    
+     <!-- 生成的SQL映射文件包名和位置，这里配置将生成的SQL映射文件放在com.center.buuluu.dao.xml这个包下 -->
+    <sqlMapGenerator targetPackage="com.center.buuluu.dao.xml" targetProject="com.center.buuluu.service" >
+    <property name="enableSubPackages" value="true" />
+    </sqlMapGenerator>
+    
+    <!-- 生成DAO的包名和位置，这里配置将生成的dao类放在com.center.buuluu.dao.mapper这个包下 -->
+    <javaClientGenerator targetPackage="com.center.buuluu.dao.mapper" targetProject="com.center.buuluu.service" type="XMLMAPPER" >
+     <property name="enableSubPackages" value="true" />
+    </javaClientGenerator>
+    
+     <!-- 要生成那些表(更改tableName和domainObjectName就可以) -->
+   <!--  <table schema="???" tableName="???" >
+      <columnOverride column="???" property="???" /> -->
+      <table tableName="ad_video" domainObjectName="AppVideo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false" />
+    <!-- </table> -->
+  </context>
+</generatorConfiguration>
