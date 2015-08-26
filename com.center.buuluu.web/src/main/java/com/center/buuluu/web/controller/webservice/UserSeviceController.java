@@ -260,7 +260,7 @@ public class UserSeviceController {
 				user.setTelValueFlag(2);//修改验证码验证状态，表示验证码验证完成
 				user.setUpdatedBy(Constant.UPDATE_BY_API);
 				user.setUpdatedTime(DateUtil.getCurrentDate());
-				boolean flag =userService.update(user,user.getId());
+				boolean flag =userService.update(user,user.getId()+user.getTel());
 				if (!flag) 
 					throw new BaseAPIException();
 				jsonStr = ResultUtil.getResultJson(user);
@@ -342,7 +342,7 @@ public class UserSeviceController {
 			String imei,String mac,String imsi , String userId, String token) throws Exception {
 		String jsonStr = null;
 		AppUser user = null;
-		user = userService.getUserById(userId);
+		user = userService.getUserById(userId,userId+token);
 		
 		if (user==null) 
 			throw new UserNotExistException(lang);
@@ -405,7 +405,7 @@ public class UserSeviceController {
 			String imei,String mac,String imsi , String userId, String token,String oldPwd,String newPwd) throws Exception {
 		String jsonStr = null;
 		AppUser user = null;
-		user = userService.getUserById(userId);
+		user = userService.getUserById(userId,userId+token);
 		
 		if (!user.getPwd().equals(oldPwd)) {//验证旧密码是否正确
 			throw new WrongPasswordException(lang);
@@ -414,7 +414,7 @@ public class UserSeviceController {
 		user.setPwd(newPwd);
 		user.setUpdatedBy(Constant.UPDATE_BY_API);
 		user.setUpdatedTime(DateUtil.getCurrentDate());
-		boolean flag =userService.update(user,user.getId());
+		boolean flag =userService.update(user,user.getId()+user.getTel());
 		if (flag) {
 			jsonStr = ResultUtil.getResultJson(true);
 		}else {
@@ -474,12 +474,12 @@ public class UserSeviceController {
 				//因为国内发送不了email，暂时定到都成功
 				resultMap.put("status", "200");
 			}
-			if (resultMap.get("status").toString().equals("p")) {
+			if (resultMap.get("status").toString().equals("200")) {
 				//将数据库中的密码清除
 				AppUser user = null;
 				user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 				user.setPwd("");
-				boolean flag =userService.update(user,user.getId());
+				boolean flag =userService.update(user,user.getId()+tel);
 				jsonStr = ResultUtil.getResultJson("");
 			}else {
 				throw new BaseAPIException();
@@ -514,7 +514,7 @@ public class UserSeviceController {
 		String jsonStr = null;
 		
 		AppUser user = null;
-		user = userService.getUserById(userId);
+		user = userService.getUserById(userId,userId+token);
 		
 		if (user==null) 
 			throw new UserNotExistException(lang);
@@ -565,7 +565,7 @@ public class UserSeviceController {
 		String jsonStr = null;
 		
 		AppUser user = null;
-		user = userService.getUserById(userId);
+		user = userService.getUserById(userId,userId+token);
 		
 		if (user==null) 
 			throw new BaseAPIException();

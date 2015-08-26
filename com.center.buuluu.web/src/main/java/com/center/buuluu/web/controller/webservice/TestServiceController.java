@@ -52,7 +52,7 @@ public class TestServiceController {
 		
 		String jsonStr = null;
 		
-		Object o = userService.getUserById(id);
+		Object o = userService.getUserById(id,"x");
 		jsonStr = ResultUtil.getResultJson(o);
 		
 		model.put("message", jsonStr);

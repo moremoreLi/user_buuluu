@@ -64,11 +64,11 @@ public class UserHandler {
 		String token="";
 		String userId="";
 		if(registerType==1)//普通注册 将访问者信息同步到用户表中
-			flag =userService.register(user,vistorId,registerType);
+			flag =userService.register(user,vistorId,registerType,user.getTel()+vistorId);
 		else{
 			userId = Constant.getUUID();
 			user.setId(userId);
-			flag =userService.register(user,vistorId,registerType);
+			flag =userService.register(user,vistorId,registerType,user.getTel()+vistorId);
 		}
 		if (flag) {
 			token = Constant.getSessionId();

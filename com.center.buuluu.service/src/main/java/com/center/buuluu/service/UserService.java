@@ -16,7 +16,7 @@ public interface UserService {
 	      * @param userId
 	      * @return
 	      */
-	    AppUser getUserById(String userId);
+	    AppUser getUserById(String userId,String cache);
 
 	    /**
 	     * 根据国家编号和电话查找
@@ -32,7 +32,7 @@ public interface UserService {
 		 */
 		boolean update(AppUser user,String userId);
 		
-		boolean register( AppUser user,String vistorId,int registerType);
+		boolean register( AppUser user,String vistorId,int registerType,String cache);
 
 		boolean logout(String userId, String token);
 

@@ -41,7 +41,7 @@ public class UserServiceImpl extends Context implements UserService{
 	int flag=0;
 	@Override
 	@Cacheable(table=AppUser.class,type=TypeMode.HASH) 
-	public  AppUser getUserById(@CacheKey String id) {
+	public  AppUser getUserById(String id,@CacheKey String cache) {
 		 return appUserMapper.selectByPrimaryKey(id);
 	}
 
@@ -74,7 +74,7 @@ public class UserServiceImpl extends Context implements UserService{
 
 	@Override 
 	 @Cacheable(table=AppUser.class,type=TypeMode.HASH) 
-	public boolean register( AppUser user,@CacheKey String vistorId,int registerType) {
+	public boolean register( AppUser user,String vistorId,int registerType,@CacheKey  String cache) {
 		//先根据访问者的id号码查询访问者数据库，如果访问者数据库存在该用户信息，则将访问者的流量信息保存起来，同步到用户信息表中
 		user.setFlowCoins(0F);
 		user.setMakeFlow(0F);
