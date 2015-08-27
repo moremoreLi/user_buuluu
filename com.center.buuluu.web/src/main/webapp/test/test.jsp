@@ -20,6 +20,7 @@
 		lang:<input name="lang" type="text"/>
 		countryCode:<input name="countryCode" type="text"/>
 		device:<input name="device" type="text"/>
+		deviceVerNum:<input name="deviceVerNum" type="text"/>
 		imei:<input name="imei" type="text"/>
 		mac:<input name="mac" type="text"/>
 		imsi:<input name="imsi" type="text"/>
@@ -130,5 +131,53 @@
 		email:<input name="email" type="text"/>
 		<input type="submit" style="width: 200px" value="recoverPassword"/>
 </form>
+
+<form name="EventForm" action="../getUserProfile.do" method="post">
+		<h2>API getUserProfile.do</h2>
+		lang:<input name="lang" type="text"/>
+		device:<input name="device" type="text"/>
+		deviceVerNum:<input name="deviceVerNum" type="text"/>
+		imei:<input name="imei" type="text"/>
+		mac:<input name="mac" type="text"/>
+		imsi:<input name="imsi" type="text"/>
+		userId:<input name="userId" type="text"/>
+		token:<input name="token" type="text"/>
+		<input type="submit" style="width: 200px" value="getUserProfile"/>
+</form>
+
+<form name="EventForm" action="../updateUserProfile.do" method="post">
+		<h2>API updateUserProfile.do</h2>
+		lang:<input name="lang" type="text"/>
+		device:<input name="device" type="text"/>
+		deviceVerNum:<input name="deviceVerNum" type="text"/>
+		imei:<input name="imei" type="text"/>
+		mac:<input name="mac" type="text"/>
+		imsi:<input name="imsi" type="text"/>
+		userId:<input name="userId" type="text"/>
+		token:<input name="token" type="text"/>
+		sex:<input name="sex" type="text"/>
+		icon:<input name="icon" type="text"/>
+		birthday:<input name="birthday" type="text"/>
+		country:<input name="country" type="text"/>
+		nickName:<input name="nickName" type="text"/>
+		log:<input name="log" type="text"/>
+		lat:<input name="lat" type="text"/>
+		tel:<input name="tel" type="text"/>
+		<input type="submit" style="width: 200px" value="updateUserProfile"/>
+</form>
+
+<form name="EventForm" action="../logout.do" method="post">
+		<h2>API logout.do</h2>
+		lang:<input name="lang" type="text"/>
+		device:<input name="device" type="text"/>
+		deviceVerNum:<input name="deviceVerNum" type="text"/>
+		imei:<input name="imei" type="text"/>
+		mac:<input name="mac" type="text"/>
+		imsi:<input name="imsi" type="text"/>
+		userId:<input name="userId" type="text"/>
+		token:<input name="token" type="text"/>
+		<input type="submit" style="width: 200px" value="logout"/>
+</form>
+
 </BODY>
 </html>

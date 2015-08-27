@@ -40,10 +40,10 @@ public class UserHandler {
 //	@Autowired
 //	private SmsService smsService;
 //	
-	boolean flag=false;
+//	boolean flag=false;
 	private static final String SMS_DOMAIN= PropertiesUtil.getProperty("SMS_DOMAIN");
 	
-	AppUserSession userSession=null;
+//	AppUserSession userSession=null;
 	//registerType 快速注册类型，1是普通注册，2是快速注册
 	/**
 	 * @param user
@@ -57,30 +57,20 @@ public class UserHandler {
 	 * @return
 	 * @throws SQLException
 	 */
-	public UserVO register(AppUser user, String lang, Integer device, String imei, String mac,
-			String imsi,int registerType, String vistorId) throws SQLException {
-		UserVO vo  = new UserVO();
+	public UserVO register(AppUser user, String countryCode, String tel,
+			String pwd, String activation, Float flowCoins, Integer pushStatus,
+			Double lat, Double log, String lang, Integer device, String imei,
+			String imsi, String mac, int  registerType) throws SQLException {
+		
+		UserVO vo  = null;
 		boolean usersessionAddFlag=false;
 		String token="";
-		String userId="";
-		if(registerType==1)//普通注册 将访问者信息同步到用户表中
-			flag =userService.register(user,vistorId,registerType,user.getTel()+vistorId);
-		else{
-			userId = Constant.getUUID();
-			user.setId(userId);
-			flag =userService.register(user,vistorId,registerType,user.getTel()+vistorId);
-		}
+		String userId=user.getId();
+		  //注册用户信息
+		boolean flag =userService.register(user,countryCode,tel,pwd,pushStatus,log,lat,flowCoins,registerType);
 		if (flag) {
-			token = Constant.getSessionId();
-			userSession=new AppUserSession();
-			userSession.setUserId(userId);
-			userSession.setToken(token);
-			userSession.setLang(lang);
-			userSession.setDevice(device+"");
-			userSession.setImei(imei);
-			userSession.setMac(mac);
-			userSession.setImsi(imsi);
-			usersessionAddFlag = userSessionService.addSession(userSession,userSession.getUserId());//在当前活动的用户表中添加该用户信息
+			token =Constant.getSessionId();
+			usersessionAddFlag = userSessionService.addSession(userId,lang,device,imei,mac,imsi,token);//在当前活动的用户表中添加该用户信息
 		}
 		if (usersessionAddFlag) {
 			vo = new UserVO();
@@ -97,111 +87,18 @@ public class UserHandler {
 			vo.setLat(user.getLat());
 			vo.setLog(user.getLog());
 			vo.setTel(user.getTel());
-		}
-		if (vo==null)
+		}else{
 			throw new BaseAPIException();
-		
-		
-		/*if (registerType==1) {
-			flag =userService.register(user,activation,vistorId);//将访问者信息同步到用户表中
-			if (flag) {
-				String token = Constant.getSessionId();
-				userSession.setToken(token);
-				userSession.setLang(lang);
-				userSession.setDevice(device+"");
-				userSession.setImei(imei);
-				userSession.setMac(mac);
-				userSession.setImsi(imsi);
-				flag = userSessionService.addSession(userSession);//在当前活动的用户表中添加该用户信息
-				if (flag) {
-					vo = new UserVO();
-					vo.setToken(token);
-					vo.setLat(user.getLat());
-					vo.setLog(user.getLog());
-					vo.setUserFlow(user.getUserFlow());
-					vo.setFlowCoins(user.getFlowCoins());
-					vo.setMakeFlow(user.getMakeFlow());
-					vo.setCredit(user.getCredit());
-					vo.setNickName(user.getNickName());
-					vo.setIcon(user.getIcon());
-					vo.setCountry(user.getCountry());
-					vo.setBirthday(user.getBirthday());
-					vo.setTel(user.getTel());
-				}
-			}
-			
-			if (vo==null) 
-				throw new BaseAPIException();
-		}else {
-			String userId = Constant.getUUID();
-			flag =userService.register(user,userId,vistorId);
-			if (flag) {
-				String token = Constant.getSessionId();
-				userSession.setUserId(userId);
-				userSession.setToken(token);
-				userSession.setLang(lang);
-				userSession.setDevice(device+"");
-				userSession.setImei(imei);
-				userSession.setMac(mac);
-				userSession.setImsi(imsi);
-				flag= userSessionService.addSession(userSession);
-				if (flag) {
-					vo = new UserVO();
-					vo.setUserId(userId);
-					vo.setToken(token);
-					vo.setUserFlow(user.getUserFlow());
-					vo.setFlowCoins(user.getFlowCoins());
-					vo.setMakeFlow(user.getMakeFlow());
-					vo.setCredit(user.getCredit());
-					vo.setNickName(user.getNickName());
-					vo.setIcon(user.getIcon());
-					vo.setCountry(user.getCountry());
-					vo.setBirthday(user.getBirthday());
-					vo.setLat(user.getLat());
-					vo.setLog(user.getLog());
-					vo.setTel(user.getTel());
-				}
-			}
-			
-			if (vo==null) 
-				throw new BaseAPIException();
-		}*/
+		}
 		
 		return vo;
 	}
-
+	
 	public UserVO login(String lang,Integer  device,String imei,String mac,String imsi,AppUser user) throws SQLException {
-		//AppUserSession userSessio=null;
 		String userId = user.getId().toString();
 		UserVO vo = null;
-		 userSession =userSessionService.getUserSessionByUserId(userId);
-		 String token = Constant.getSessionId();
-		 boolean userSession_is_insert=false;
-		 if(userSession==null){
-			 userSession=new AppUserSession();
-			 userSession.setUserId(userId);
-			 userSession.setDevice(device+"");
-			 userSession.setCreatedBy(Constant.CREATE_BY_API);
-			 userSession.setCreatedTime(DateUtil.getCurrentDate());
-			 userSession.setLoginTime(DateUtil.getCurrentDate());
-			 userSession.setStatus(1);
-			 userSession_is_insert=false;
-		 }else{
-			 userSession.setUpdatedBy(Constant.UPDATE_BY_API);
-			 userSession.setUpdatedTime(DateUtil.getCurrentDate());
-			 userSession.setStatus(1);
-			 userSession_is_insert=true;
-		 }
-		userSession.setToken(token);
-		userSession.setLang(lang);
-		userSession.setImei(imei);
-		userSession.setMac(mac);
-		userSession.setImsi(imsi);
-		if(!userSession_is_insert){
-			flag = userSessionService.addSession(userSession,userSession.getUserId());
-		}else{
-			flag =userSessionService.updateUserSession(userSession,userSession.getUserId());
-		}
+		String token =Constant.getSessionId();
+		boolean flag =userSessionService.addSession(userId,lang,device,imei,mac,imsi,token);
 		if (flag) {
 			vo = new UserVO();
 			vo.setUserId(userId);
@@ -232,6 +129,7 @@ public class UserHandler {
         http://58.96.173.161:8081/notifyCentreServer/sms?countrycode=66&msisdn=0805723615&msg=Test%20Msg
 	 */
 	public boolean update(AppUser user,String lang,String countryCode,String tel) throws Exception {
+		 boolean flag = false;
 		ResourceBundleMessageSource s = new ResourceBundleMessageSource();
 		s.setBasename("i18n/message");
 		String msg = s.getMessage("subject", null,I18nUtil.getLocale(lang));
@@ -258,21 +156,6 @@ public class UserHandler {
 			if(!countryCode.equals("66")){//因为发送短信机制用不了，设定短信为1234
 				autoCode = "1234";
 			}
-			if (user!=null) {
-				/*
-				 * 如果用户存在(以前是游客，不是正式用户的时候)，保存验证码到user表中
-				 */
-				user.setTelApproveKey(autoCode);
-				user.setTelValueFlag(1);//表示验证中
-				user.setTel(tel);
-				user.setCountryCode(countryCode);
-				user.setUpdatedBy(Constant.UPDATE_BY_API);
-				user.setUpdatedTime(DateUtil.getCurrentDate());
-				return userService.update(user,user.getId());
-			}else {
-				/*
-				 * 如果用户不存在(以前从来没有玩过这个游戏)，添加用户信息到user表中
-				 */
 				user = new AppUser();
 				user.setTelApproveKey(autoCode);
 				user.setTelValueFlag(1);
@@ -293,13 +176,12 @@ public class UserHandler {
 				user.setNickName("");
 				user.setLog(0D);
 				user.setLat(0D);
-				flag = userService.addUser(user,user.getId());
+				flag = userService.addUser(user);
 				if (flag) {
 					return true;
 				}else{
 					return false;
 				}
-			}
 		}
 		return false;
 	}

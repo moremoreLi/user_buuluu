@@ -1,7 +1,6 @@
 package com.center.buuluu.dao.mapper;
 
-import java.util.Map;
-
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import com.center.buuluu.annotation.MyBatisRepository;
@@ -70,6 +69,6 @@ public interface AppUserMapper {
 	 * @param map
 	 * @return
 	 */
-	AppUser getByTel(Map<String, String> map);
+	AppUser getByTel(@Param("countryCode") String countryCode,@Param("tel") String tel);
 
 }

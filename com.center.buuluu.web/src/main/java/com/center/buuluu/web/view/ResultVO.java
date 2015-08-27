@@ -4,17 +4,18 @@ import com.center.buuluu.common.util.CodeStatus;
 
 public class ResultVO<T> {
 
-	private int errorCode = CodeStatus.SUCCESS;
+	private String status = CodeStatus.SUCCESS;
 	private String errorMessage = "";
 	/*JSON 返回做了+ -分數 主鍵ID*/
 	private T result;
 
-	public int getErrorCode() {
-		return errorCode;
+
+	public String getStatus() {
+		return status;
 	}
 
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public String getErrorMessage() {

@@ -62,6 +62,6 @@ public interface AppUserSessionMapper {
 
 	AppUserSession checkUserSession(Map<String, String> map);
 
-	int updateUserSession(Map<String, String> map);
+	int updateUserSession(AppUserSession appUserSession);
 
 }

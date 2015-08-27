@@ -142,8 +142,19 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/register.do",method=RequestMethod.POST)
+	@Transactional
 	public  String register(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
-			String imei,String mac,String imsi , String countryCode, String tel, Double log,Double lat,String pwd,Integer pushStatus,String activation,String vistorId) throws Exception {
+			String imei,String mac,String imsi , String countryCode, String tel, Double log,Double lat,String pwd,Integer pushStatus,String activation,Float flowCoins) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(countryCode,null);
+		Assert.hasText(tel,null);
+		Assert.hasText(pwd,null);
+		Assert.hasText(activation,null);
 		String jsonStr = null;
 		AppUser user = null;
 		UserVO userVO = null;
@@ -157,15 +168,9 @@ public class UserSeviceController {
 				throw new NotVerifyActivationException(lang);
 			}else if (user.getTelValueFlag()==1) {
 				//表示验证进行中，把用户信息更新到user表，根据访问者表(vistoruser)查到用户id，把用户信息保存到用户活动表（usersession）中
-				user.setTelValueFlag(2);
-				user.setCountryCode(countryCode);
-				user.setTel(tel);
-				user.setPwd(pwd);
-				user.setPushStatus(pushStatus);
-				user.setLog(log);
-				user.setLat(lat);
+				
 //				user.setTelApproveKey(activation);//因为在获取验证码的时候保存到了 数据库，验证验证码的时候修改了验证码的值，所以在此不需要修改验证码了
-				userVO = userHandler.register(user,lang,device,imei,mac,imsi,1,vistorId);
+				userVO = userHandler.register(user,countryCode,tel,pwd,activation,flowCoins,pushStatus,lat,log,lang,device,imei,imsi,mac,1);
 			}else if (user.getTelValueFlag()==2) {//表示已经验证通过了，不用验证了
 				throw new VerifyActivationPassException(lang);
 			}else {
@@ -200,8 +205,18 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/quickRegister.do",method=RequestMethod.POST)
+	@Transactional
 	public  String quickRegister(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
-			String imei,String mac,String imsi , String countryCode, String tel, Double log,Double lat,String pwd,Integer pushStatus,String vistorId) throws Exception {
+			String imei,String mac,String imsi , String countryCode, String tel, Double log,Double lat,String pwd,Integer pushStatus,Float  flowCoins) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(countryCode,null);
+		Assert.hasText(tel,null);
+		Assert.hasText(pwd,null);
 		String jsonStr = null;
 		AppUser user = null;
 		UserVO userVO = null;
@@ -209,19 +224,12 @@ public class UserSeviceController {
 		/*
 		 * 快速注册的时候，如果查询到该用户，表示该用户存在，如果没有查到该用户，则生成一个用户对象，保存到数据库中
 		 */
-		if (user != null) {
+		if (user != null) 
 			throw new ExistMobileException(lang);
-		}else{
+			
 			user=new AppUser();
-		}
-		user.setCountryCode(countryCode);
-		user.setTel(tel);
-		user.setPwd(pwd);
-		user.setPushStatus(pushStatus);
-		user.setLog(log);
-		user.setLat(lat);
-		userVO = userHandler.register(user, lang, device, imei, mac, imsi, 2,vistorId);
-//		userVO = userHandler.register(countryCode, tel, pwd, pushStatus, log, lat, lang, device, imei, mac, imsi, user, "", 2,vistorId);
+			user.setId(Constant.getUUID());
+		userVO = userHandler.register(user,countryCode,tel,pwd,null,flowCoins,pushStatus,lat,log,lang,device,imei,imsi,mac,2);
 		jsonStr = ResultUtil.getResultJson(userVO);
 		model.put("message", jsonStr);
 		return "message.json";
@@ -246,6 +254,14 @@ public class UserSeviceController {
 	@RequestMapping(value = "/verifyActivation.do",method=RequestMethod.POST)
 	public String verifyActivation(HttpServletRequest request, ModelMap model, String lang,Integer device,String deviceVerNum,
 			String imei,String mac,String imsi , String countryCode, String tel, String activation) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(countryCode,null);
+		Assert.hasText(tel,null);
 		String jsonStr = null;
 		AppUser user = null;
 		user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
@@ -260,7 +276,7 @@ public class UserSeviceController {
 				user.setTelValueFlag(2);//修改验证码验证状态，表示验证码验证完成
 				user.setUpdatedBy(Constant.UPDATE_BY_API);
 				user.setUpdatedTime(DateUtil.getCurrentDate());
-				boolean flag =userService.update(user,user.getId()+user.getTel());
+				boolean flag =userService.update(user);
 				if (!flag) 
 					throw new BaseAPIException();
 				jsonStr = ResultUtil.getResultJson(user);
@@ -292,19 +308,28 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/login.do",method=RequestMethod.POST)
-//	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional
 	public String login(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi , String countryCode, String tel, String pwd) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(countryCode,null);
+		Assert.hasText(tel,null);
+		Assert.hasText(pwd,null);
 		String jsonStr = null;
-		if (!StringUtils.isEmpty(tel)&& !StringUtils.isEmpty(pwd)) {
-			AppVistorUser user = new AppVistorUser();
-			user.setId(Constant.getTempUserId());
-			boolean flag = vistorUserService.add(user,user.getId());
-			if (!flag) 
-				throw new UserNotExistException(lang);
-			
-			jsonStr = returnJsonStr2(user.getId().toString(), Constant.getSessionId(), user);
-		}else {
+//		if (!StringUtils.isEmpty(tel)&& !StringUtils.isEmpty(pwd)) {
+//			AppVistorUser user = new AppVistorUser();
+//			user.setId(Constant.getTempUserId());
+//			boolean flag = vistorUserService.add(user,user.getId());
+//			if (!flag) 
+//				throw new UserNotExistException(lang);
+//			
+//			jsonStr = returnJsonStr2(user.getId().toString(), Constant.getSessionId(), user);
+//		}else {
 			AppUser user = null;
 			user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
 			if (user == null) {
@@ -316,7 +341,7 @@ public class UserSeviceController {
 			}else{
 				throw new WrongPasswordException(lang);
 			}
-		}
+//		}
 		model.put("message", jsonStr);
 		return "message.json";
 	}
@@ -340,9 +365,17 @@ public class UserSeviceController {
 	@RequestMapping(value = "/autoLogin.do",method=RequestMethod.POST)
 	public String autoLogin(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi , String userId, String token) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(userId,null);
+		Assert.hasText(token,null);
 		String jsonStr = null;
 		AppUser user = null;
-		user = userService.getUserById(userId,userId+token);
+		user = userService.getUserById(userId);
 		
 		if (user==null) 
 			throw new UserNotExistException(lang);
@@ -401,20 +434,31 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/resetPassword.do",method=RequestMethod.POST)
+	@Transactional
 	public String resetPassword(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi , String userId, String token,String oldPwd,String newPwd) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(userId,null);
+		Assert.hasText(token,null);
+		Assert.hasText(oldPwd,null);
+		Assert.hasText(newPwd,null);
 		String jsonStr = null;
 		AppUser user = null;
-		user = userService.getUserById(userId,userId+token);
+		user = userService.getUserById(userId);
 		
 		if (!user.getPwd().equals(oldPwd)) {//验证旧密码是否正确
 			throw new WrongPasswordException(lang);
 		}
 		
-		user.setPwd(newPwd);
 		user.setUpdatedBy(Constant.UPDATE_BY_API);
 		user.setUpdatedTime(DateUtil.getCurrentDate());
-		boolean flag =userService.update(user,user.getId()+user.getTel());
+		user.setPwd(newPwd);
+		boolean flag =userService.update(user);
 		if (flag) {
 			jsonStr = ResultUtil.getResultJson(true);
 		}else {
@@ -442,8 +486,17 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/recoverPassword.do",method=RequestMethod.POST)
+	@Transactional
 	public String recoverPassword(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi,String countryCode,String tel,String email) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(countryCode,null);
+		Assert.hasText(tel,null);
 		String jsonStr = null;
 		
 		if (!StringUtils.isEmpty(email)) {
@@ -454,12 +507,13 @@ public class UserSeviceController {
                msg（必选）：下发正文, 需要对内容进行urlencode
                templateid（必选）：下发使用的模板id，请联系管理员获取可使用ID
 			 */
+			String newPwd = getAutCode(6);
 			Map<String,String> params = new HashMap<String, String>();
 			ResourceBundleMessageSource s = new ResourceBundleMessageSource();
 			s.setBasename("i18n/message");
 			String subject = s.getMessage("email_subject", null,I18nUtil.getLocale(lang));
 			String msg = s.getMessage("email_msg", null,I18nUtil.getLocale(lang));
-			msg = msg.replaceAll("newPwd", getAutCode(6));
+			msg = msg.replaceAll("newPwd", newPwd);
 			params.put("subject", subject);
 			params.put("recipient", email);
 			params.put("cc", "");
@@ -472,22 +526,28 @@ public class UserSeviceController {
 				resultMap = Json.toMap(result);
 			} catch (Exception e) {
 				//因为国内发送不了email，暂时定到都成功
+				e.printStackTrace();
 				resultMap.put("status", "200");
 			}
 			if (resultMap.get("status").toString().equals("200")) {
 				//将数据库中的密码清除
 				AppUser user = null;
 				user = userService.getByTel(countryCode,tel,countryCode+Constant.STRING_SPLIT+tel);
-				user.setPwd("");
-				boolean flag =userService.update(user,user.getId()+tel);
-				jsonStr = ResultUtil.getResultJson("");
+				user.setPwd(newPwd);
+				user.setUpdatedBy(Constant.UPDATE_BY_API);
+				user.setUpdatedTime(DateUtil.getCurrentDate());
+				boolean flag =userService.update(user);
+				if (!flag) 
+				throw new BaseAPIException();
+					
+				
 			}else {
 				throw new BaseAPIException();
 			}
-		}else {
-			jsonStr = ResultUtil.getResultJson("");
 		}
-
+		
+		jsonStr = ResultUtil.getResultJson("");
+		
 		model.put("message", jsonStr);
 		return "message.json";
 	}
@@ -511,10 +571,18 @@ public class UserSeviceController {
 	public String getUserProfile(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi,
 			String userId,String token) throws Exception {
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(userId,null);
+		Assert.hasText(token,null);
 		String jsonStr = null;
 		
 		AppUser user = null;
-		user = userService.getUserById(userId,userId+token);
+		user = userService.getUserById(userId);
 		
 		if (user==null) 
 			throw new UserNotExistException(lang);
@@ -549,23 +617,24 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/updateUserProfile.do",method=RequestMethod.POST)
-//	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional
 	public String updateUserProfile(HttpServletRequest request, ModelMap model, String lang,Integer device,String deviceVerNum,
 			String imei,String mac,String imsi,
 			Integer sex,String icon,Long birthday,String country,String nickName,Double log,
 			Double lat,String userId,String token,String tel) throws Exception {
-//		Assert.hasText(lang, null);
-//		Assert.notNull(device,null);
-//		Assert.hasText(deviceVerNum, null);
-//		Assert.hasText(imei, null);
-//		Assert.hasText(mac, null);
-//		Assert.hasText(imsi,null);
-//		Assert.hasText(userId);
-//		Assert.hasText(token);
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(userId);
+		Assert.hasText(token);
 		String jsonStr = null;
 		
 		AppUser user = null;
-		user = userService.getUserById(userId,userId+token);
+		user = userService.getUserById(userId);
+		boolean flag = false;
 		
 		if (user==null) 
 			throw new BaseAPIException();
@@ -582,10 +651,11 @@ public class UserSeviceController {
 			user.setLat(log);
 		if (lat!=null) 
 			user.setLat(lat);
-		if (tel!=null) 
+		if (tel!=null) {
+			userService.update(user);
 			user.setTel(tel);
-		
-		boolean flag =userService.update(user,user.getId());
+		}
+		flag =userService.update(user);
 		if (flag) {
 			jsonStr = ResultUtil.getResultJson("");
 		}else {
@@ -612,15 +682,18 @@ public class UserSeviceController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/logout.do",method=RequestMethod.POST)
+	@Transactional
 	public String logout(HttpServletRequest request, ModelMap model, String lang, Integer device,String deviceVerNum,
 			String imei,String mac,String imsi,
 			String userId,String token) throws Exception {
-//		log.info("logout.do?" + "lang=" + lang + "&device=" + device + "&deviceVerNum=" + deviceVerNum + "&userId=" + userId + "&session=" + session);
-//		Assert.hasText(lang, "lang " + I18nUtil.getMessage(-2, null, lang));
-//		Assert.hasText(device, "device " + I18nUtil.getMessage(-2, null, lang));
-//		Assert.hasText(deviceVerNum, "deviceVerNum " + I18nUtil.getMessage(-2, null, lang));
-//		Assert.hasText(userId, "userId " + I18nUtil.getMessage(-2, null, lang));
-//		Assert.hasText(session, "session " + I18nUtil.getMessage(-2, null, lang));
+		Assert.hasText(lang, null);
+		Assert.notNull(device,null);
+		Assert.hasText(deviceVerNum, null);
+		Assert.hasText(imei, null);
+		Assert.hasText(mac, null);
+		Assert.hasText(imsi,null);
+		Assert.hasText(userId);
+		Assert.hasText(token);
 		String jsonStr = null;
 
 		boolean  flag = userService.logout(userId,token);

@@ -31,7 +31,7 @@ public class InvalidArgumentException extends BuuluuAPIException {
 
 	@Override
 	public int getErrorCode() {
-		return CodeStatus.ILLEGAL_ARGUMENT;
+		return CodeStatus.INPUT_PARAM_ERROR;
 	}
 
 }

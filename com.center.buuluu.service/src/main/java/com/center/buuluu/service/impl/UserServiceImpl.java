@@ -1,29 +1,18 @@
 package com.center.buuluu.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.center.buuluu.annotation.CacheKey;
-import com.center.buuluu.annotation.CachePut;
-import com.center.buuluu.annotation.CachePut.PutTypeMode;
-import com.center.buuluu.annotation.CacheValue;
-import com.center.buuluu.annotation.Cacheable;
-import com.center.buuluu.annotation.Cacheable.TypeMode;
 import com.center.buuluu.common.Context;
+import com.center.buuluu.common.exception.IllegalUserSessionException;
 import com.center.buuluu.common.util.Constant;
 import com.center.buuluu.common.util.DateUtil;
-import com.center.buuluu.dao.mapper.AppUserMapper;
+import com.center.buuluu.dao.UserDao;
+import com.center.buuluu.dao.UserSessionDao;
 import com.center.buuluu.model.AppUser;
-import com.center.buuluu.model.AppVistorUser;
+import com.center.buuluu.model.AppUserSession;
 import com.center.buuluu.service.UserService;
-import com.center.buuluu.service.UserSessionService;
-import com.center.buuluu.service.VistorUserService;
 
 
 @Service("userService")
@@ -31,50 +20,37 @@ import com.center.buuluu.service.VistorUserService;
 public class UserServiceImpl extends Context implements UserService{
 	
 	@Autowired
-	private AppUserMapper appUserMapper;
+	private UserDao userDao;
 	
 	@Autowired
-	private VistorUserService vistorUserService;
+	private UserSessionDao userSessionDao;
 	
-	@Autowired
-	private UserSessionService userSessionService;
-	int flag=0;
+	
 	@Override
-	@Cacheable(table=AppUser.class,type=TypeMode.HASH) 
-	public  AppUser getUserById(String id,@CacheKey String cache) {
-		 return appUserMapper.selectByPrimaryKey(id);
+	public  AppUser getUserById(String id) {
+		 return userDao.getUserById(id);
 	}
 
 	@Override
-	@Cacheable(table=AppUser.class)
-	public AppUser getByTel(String countryCode, String tel,@CacheKey String countryCodeTel) {
-		Map<String,String> map = new HashMap<String, String>();
-		map.put("countryCode", countryCode);
-		map.put("tel", tel);
-		return appUserMapper.getByTel(map);
+	public AppUser getByTel(String countryCode, String tel,String countryCodeTel) {
+		return userDao.getByTel(countryCode,tel,countryCodeTel);
 	}
 
 	@Override
-	@Cacheable(table=AppUser.class,type=TypeMode.HASH) 
-	public boolean update(@CacheValue AppUser user,@CacheKey String userId) {
-		flag=appUserMapper.updateByPrimaryKeySelective(user);
-		if(flag<1)
-			return false;
-		return true;
+	public boolean update( AppUser user) {
+		return userDao.update( user,user.getId(),user.getCountryCode()+Constant.STRING_SPLIT+user.getTel());
 	}
 
 	@Override
-	@CachePut(table=AppUser.class,type=PutTypeMode.HASH)
-	public boolean addUser(@CacheValue AppUser user,@CacheKey String userId) {
-		flag=appUserMapper.insertSelective(user);
-		if(flag<1)
-			return false;
-		return true;
+	public boolean addUser(AppUser user) {
+		return userDao.addUser(user,user.getId());
 	}
 
 	@Override 
-	 @Cacheable(table=AppUser.class,type=TypeMode.HASH) 
-	public boolean register( AppUser user,String vistorId,int registerType,@CacheKey  String cache) {
+	public boolean register( AppUser user, String countryCode,
+			String tel, String pwd, Integer pushStatus, Double log,
+			Double lat, Float flowCoins, int registerType) {
+		int resultSize=0;
 		//先根据访问者的id号码查询访问者数据库，如果访问者数据库存在该用户信息，则将访问者的流量信息保存起来，同步到用户信息表中
 		user.setFlowCoins(0F);
 		user.setMakeFlow(0F);
@@ -88,36 +64,34 @@ public class UserServiceImpl extends Context implements UserService{
 		user.setIcon("");
 		user.setCountry("");
 		user.setNickName("");
-		if (user.getLog()==null) 
-			user.setLog(0D);
-		if (user.getLat()==null) 
-			user.setLat(0D);
-		if (StringUtils.isNotEmpty(vistorId)) {
-			 AppVistorUser vistorUser=null;
-			try {
-				vistorUser =vistorUserService.getUserById(vistorId);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			 if (vistorUser!=null) {
-				user.setFlowCoins(vistorUser.getFlowCoins());
-				user.setMakeFlow(vistorUser.getMakeFlow());
-				user.setUserFlow(vistorUser.getUserFlow());
-			}
-		}
+		user.setLog(log==null?0D:log);
+		user.setLat(lat==null?0D:lat);
+		user.setTelValueFlag(2);
+	    user.setCountryCode(countryCode);
+	    user.setTel(tel);
+	    user.setPwd(pwd);
+	    user.setPushStatus(pushStatus);
+	    user.setIsDeleted(0);
 		if(registerType==1){//表示普通注册
-			flag =appUserMapper.updateByPrimaryKeySelective(user);
+			resultSize =userDao.updateByPrimaryKeySelective(user,user.getId(),countryCode+Constant.STRING_SPLIT+tel);
 		}else{
-			flag =appUserMapper.insertSelective(user);
+			resultSize =userDao.insertSelective(user,user.getId());
 		}
-		if(flag<1)
+		if(resultSize<1)
 			return false;
 		return true;
 	}
 
 	@Override
-	 @Cacheable(table=AppUser.class,type=TypeMode.HASH) 
 	public boolean logout(String userId, String token) {
-		return userSessionService.logout(userId,token);
+		AppUserSession userSession = userSessionDao.getUserSessionByUserId(userId);
+		if (userSession!=null) {
+			userSession.setStatus(0);
+			userSession.setUpdatedBy(Constant.UPDATE_BY_API);
+			userSession.setUpdatedTime(DateUtil.getCurrentDate());
+			return userSessionDao.updateUserSession(userSession, userId);
+		}else {
+			throw new IllegalUserSessionException(null);
+		}
 	}
 }

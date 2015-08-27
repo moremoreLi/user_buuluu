@@ -38,7 +38,7 @@ public class WebHandlerExceptionResolver implements
 
 		ResultVO<Object> result = new ResultVO<Object>();
 		
-		result.setErrorCode(Integer.parseInt(errorCode));
+		result.setStatus(errorCode);
 		result.setErrorMessage(errorMessage);
 		result.setResult(null);
 		
@@ -64,24 +64,28 @@ public class WebHandlerExceptionResolver implements
 	public static String getErrorInfo(HttpServletRequest request, HttpServletResponse response, Throwable exception) {
 		logger.info("exception:" + exception.getMessage(), exception);
 
-		String errorCode = String.valueOf(CodeStatus.UNKNOWN);
+		String errorCode = String.valueOf(CodeStatus.SYSTEM_ERROR);
 		request.setAttribute(ERROR_CODE_PARAMETER_NAME, errorCode);
 		request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME, exception.getMessage());
+		request.setAttribute("result", "");
 		
 		if (exception instanceof BuuluuAPIException) {
 			errorCode = String.valueOf(((BuuluuAPIException) exception).getErrorCode());
-			if(CodeStatus.UNKNOWN==((BuuluuAPIException) exception).getErrorCode()){
+			if(CodeStatus.SYSTEM_ERROR==((BuuluuAPIException) exception).getErrorCode()){
+				request.setAttribute("result", null);
 				request.setAttribute(ERROR_CODE_PARAMETER_NAME, errorCode);
-				request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME,I18nUtil.getMessage(CodeStatus.UNKNOWN, null, null));
+				request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME,I18nUtil.getMessage(CodeStatus.SYSTEM_ERROR, null, null));
 			}else{
 				request.setAttribute(ERROR_CODE_PARAMETER_NAME, errorCode);
-				request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME,exception.getMessage());
+				request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME,"");
+				request.setAttribute("result", "");
 			}
 		}
 		if(exception instanceof IllegalArgumentException){
-			errorCode=String.valueOf(CodeStatus.ILLEGAL_ARGUMENT);
+			errorCode=String.valueOf(CodeStatus.INPUT_PARAM_ERROR);
 			request.setAttribute(ERROR_CODE_PARAMETER_NAME, errorCode);
-			request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME,exception.getMessage());
+			request.setAttribute(ERROR_MESSAGE_PARAMETER_NAME,"");
+			request.setAttribute("result",null);
 		}
 		
 		response.setStatus(HttpServletResponse.SC_OK);

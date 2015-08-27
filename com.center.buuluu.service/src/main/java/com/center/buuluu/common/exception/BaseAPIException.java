@@ -14,7 +14,7 @@ public  class BaseAPIException extends RuntimeException {
 	 */
 	private static final long serialVersionUID = -7065579710316348767L;
 
-	private int errorCode = CodeStatus.UNKNOWN;
+	private int errorCode = CodeStatus.SYSTEM_ERROR;
 	public int getErrorCode() {
 		return errorCode;
 	}

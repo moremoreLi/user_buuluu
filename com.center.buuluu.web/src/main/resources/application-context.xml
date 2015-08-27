@@ -84,7 +84,4 @@
 	<import resource="applicationContext-druid-db.xml" />
 	<import resource="schedule-task.xml" />
 
-	<!--项目启动时测试使用-->
-    <bean id="testTest" class="com.center.buuluu.web.handle.TestServiceHandle" init-method="test"/>
-
 </beans>
