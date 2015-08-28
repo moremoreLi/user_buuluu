@@ -313,6 +313,21 @@
 				<serverPath>F:/workplace</serverPath>
 			</properties>
 		</profile>
+		
+		<profile>
+			<id>Aliyun-more</id>
+			<properties>
+				<!-- datasource.properties -->
+				<datasource.url>jdbc:mysql://120.25.57.82:3306/buuluu?useUnicode=true&amp;characterEncoding=utf-8</datasource.url>
+				<datasource.username>root</datasource.username>
+				<datasource.password>123456</datasource.password>
+
+				<!-- redis.properties -->
+				<redis.host-name>120.25.57.82</redis.host-name>
+				<redis.port>6379</redis.port>
+				<serverPath>/code/user_buuluu</serverPath>
+			</properties>
+		</profile>
 	</profiles>
 </project>
 
