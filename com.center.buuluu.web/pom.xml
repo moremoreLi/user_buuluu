@@ -324,7 +324,7 @@
 
 				<!-- redis.properties -->
 				<redis.host-name>120.25.57.82</redis.host-name>
-				<redis.port>6379</redis.port>
+				<redis.port>7001</redis.port>
 				<serverPath>/code/user_buuluu</serverPath>
 			</properties>
 		</profile>
