@@ -316,7 +316,7 @@
 			<id>Aliyun-more</id>
 			<properties>
 				<!-- datasource.properties -->
-				<datasource.url>jdbc:mysql://120.25.57.82:3306/buuluu?useUnicode=true&amp;characterEncoding=utf-8</datasource.url>
+				<datasource.url>jdbc:mysql://121.201.63.36:3306/buuluu?useUnicode=true&amp;characterEncoding=utf-8</datasource.url>
 				<datasource.username>root</datasource.username>
 				<datasource.password>123456</datasource.password>
 
