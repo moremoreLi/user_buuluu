@@ -316,12 +316,12 @@
 			<id>Aliyun-more</id>
 			<properties>
 				<!-- datasource.properties -->
-				<datasource.url>jdbc:mysql://121.201.63.36:3306/buuluu?useUnicode=true&amp;characterEncoding=utf-8</datasource.url>
+				<datasource.url>jdbc:mysql://120.25.2.222:3306/buuluu?useUnicode=true&amp;characterEncoding=utf-8</datasource.url>
 				<datasource.username>root</datasource.username>
 				<datasource.password>123456</datasource.password>
 
 				<!-- redis.properties -->
-				<redis.host-name>121.201.63.36</redis.host-name>
+				<redis.host-name>120.25.2.222</redis.host-name>
 				<redis.port>6379</redis.port>
 				<serverPath>/code/user_buuluu</serverPath>
 			</properties>
